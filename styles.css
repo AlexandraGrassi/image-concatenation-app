@@ -21,6 +21,6 @@ section {
 
 }
 
-canvas#photosContainer {
+canvas {
     height: 250px;
 }

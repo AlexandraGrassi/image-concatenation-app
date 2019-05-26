@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 const inputs = Array.from(document.getElementsByTagName("input"));
 const images = [];
 let pixelRatio;
+let temp;
 
 document.addEventListener('DOMContentLoaded',() => {
     canvas.width = 0;
@@ -44,11 +45,18 @@ const getOffset = (index, canvasWidth) => {
     for (let i = 1; i <= index; i++) {
         if (images[i - 1]) {
             offset = offset + images[i - 1].width;
-        } else {
+        } /*else {
             offset = canvasWidth - images[i].width;
-        }
+            console.log(offset);
+        }*/
     }
     return offset;
+};
+
+const getImagesWidth = () => {
+    return images.reduce( (accumulator, currentValue) => {
+        return accumulator + currentValue.width;
+    },0);
 };
 
 function pushToCanvas(img, index) {
@@ -62,15 +70,18 @@ function pushToCanvas(img, index) {
         img.width = canvasHeight * imgAspectRatio;
 
         const imgOffset = getOffset(index, canvasWidth);
-        if( (canvasWidth - imgOffset) < img.width && canvasWidth !== 0) {
-            canvas.width = canvasWidth + imgOffset - (canvasWidth - imgOffset);
-        }
 
         if(canvasWidth === 0) {
             canvas.width = img.width;
             canvas.style.border = '2px solid gold';
+        } else {
+            canvas.width = getImagesWidth();
+            console.log(canvas.width);
+            ctx.putImageData(temp,0,0);
         }
+
         ctx.drawImage(img, imgOffset, 0, img.width, img.height);
+        temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
     };
 }
 
@@ -83,7 +94,6 @@ function loadImage(files, img, index) {
             img.src = fr.result;
             pushToCanvas(img, index);
             console.log(images);
-
         };
 
     }
