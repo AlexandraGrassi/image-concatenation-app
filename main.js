@@ -1,16 +1,13 @@
 const canvas = document.getElementById("photosContainer");
+const canvasTest = document.getElementById("test");
 const ctx = canvas.getContext("2d");
+const ctxTest = canvasTest.getContext("2d");
 const inputs = Array.from(document.getElementsByTagName("input"));
 const images = [];
-let pixelRatio;
 let temp;
 
 document.addEventListener('DOMContentLoaded',() => {
     canvas.width = 0;
-    /*pixelRatio = getPixelRatio();
-    ctx.scale(pixelRatio, pixelRatio);
-    canvas.style.width = canvas.width * pixelRatio + 'px';
-    canvas.style.height = canvas.height * pixelRatio + 'px';*/
 });
 
 inputs.forEach((input, index) => {
@@ -24,31 +21,15 @@ inputs.forEach((input, index) => {
     }
 });
 
-/*const getPixelRatio = () => {
-    let factor = 1;
-
-    // retina display?
-    const isRetina = (window.devicePixelRatio > 1);
-    // iOS? (-> no auto double)
-    const isIOS = ((ctx.webkitBackingStorePixelRatio < 2) || (ctx.webkitBackingStorePixelRatio === undefined));
-
-    if (isRetina && isIOS) {
-        factor = 2;
-    }
-    return factor;
-};*/
 
 const getAspectRatio = (width, height) => width / height;
 
-const getOffset = (index, canvasWidth) => {
+const getOffset = (index) => {
     let offset = 0;
     for (let i = 1; i <= index; i++) {
         if (images[i - 1]) {
             offset = offset + images[i - 1].width;
-        } /*else {
-            offset = canvasWidth - images[i].width;
-            console.log(offset);
-        }*/
+        }
     }
     return offset;
 };
@@ -63,21 +44,40 @@ function pushToCanvas(img, index) {
     img.onload = () => {
         const {width: imgWidth, height: imgHeight} = img;
         const {width: canvasWidth, height: canvasHeight} = canvas;
-
         const imgAspectRatio = getAspectRatio(imgWidth, imgHeight);
+        let tempAfter;
+        let imgOffset;
 
         img.height = canvasHeight;
         img.width = canvasHeight * imgAspectRatio;
 
-        const imgOffset = getOffset(index, canvasWidth);
+        imgOffset = getOffset(index);
+
 
         if(canvasWidth === 0) {
             canvas.width = img.width;
             canvas.style.border = '2px solid gold';
         } else {
+            ctx.clearRect(0,0,canvasWidth, canvasHeight);
+            ctx.putImageData(temp, 0, 0);
+
+            if(imgOffset === 0) {
+                tempAfter = ctx.getImageData(canvasWidth, 0, -images[index+1].width, canvas.height);
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+            }
+
             canvas.width = getImagesWidth();
-            console.log(canvas.width);
             ctx.putImageData(temp,0,0);
+
+            if(imgOffset === 0) {
+                let imgOffsetAfter = getOffset(index + 1);
+                console.log('After change' + imgOffsetAfter);
+
+                canvas.width = getImagesWidth();
+                ctx.putImageData(tempAfter, imgOffsetAfter, 0);
+                ctxTest.putImageData(tempAfter,0,0);
+            }
+
         }
 
         ctx.drawImage(img, imgOffset, 0, img.width, img.height);
