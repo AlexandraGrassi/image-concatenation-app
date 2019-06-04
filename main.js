@@ -15,19 +15,17 @@ document.addEventListener('DOMContentLoaded',() => {
 inputs.forEach((input, index) => {
     if (input.type === "file") {
         input.onchange = (e) => {
-            let files = e.target.files;
-            let curImg = new Image();
-            images[index] = curImg;
+            const files = e.target.files;
+            const image = new Image();
+            images[index] = image;
             if (FileReader && files && files.length) {
                 const fr = new FileReader();
                 fr.readAsDataURL(files[0]);
 
                 fr.onload = () => {
-                    curImg.src = fr.result.toString();
-                    pushToCanvas(curImg, index);
-                    console.log(images);
+                    image.src = fr.result.toString();
+                    pushToCanvas(image, index);
                 };
-
             }
         };
     }
@@ -55,22 +53,19 @@ function pushToCanvas(img, index) {
     img.onload = () => {
         const {width: imgWidth, height: imgHeight} = img;
         const {width: canvasWidth, height: canvasHeight} = canvas;
-
         const imgAspectRatio = getAspectRatio(imgWidth, imgHeight);
 
         let tempAfter;
-        let imgOffset;
+        const imgOffset = getOffset(index);
 
         img.height = canvasHeight;
         img.width = canvasHeight * imgAspectRatio;
-
-        imgOffset = getOffset(index);
 
         if(canvasWidth === 0) {
             canvas.width = img.width;
             canvas.style.border = '2px solid gold';
         } else {
-            ctx.clearRect(0,0,canvasWidth, canvasHeight);
+            ctx.clearRect(0,0, canvasWidth, canvasHeight);
             ctx.putImageData(temp, 0, 0);
 
             if(imgOffset === 0) {
@@ -83,8 +78,6 @@ function pushToCanvas(img, index) {
 
             if(imgOffset === 0) {
                 let imgOffsetAfter = getOffset(index + 1);
-                console.log('After change' + imgOffsetAfter);
-
                 canvas.width = getImagesWidth();
                 ctx.putImageData(tempAfter, imgOffsetAfter, 0);
                 ctxTest.putImageData(tempAfter,0,0);
