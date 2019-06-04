@@ -33,18 +33,12 @@ inputs.forEach((input, index) => {
 
 const getAspectRatio = (width, height) => width / height;
 
-const getOffset = (index) => {
-    let offset = 0;
-    for (let i = 1; i <= index; i++) {
-        if (images[i - 1]) {
-            offset = offset + images[i - 1].width;
-        }
-    }
-    return offset;
+const getLeftOffset = (index) => {
+    return images.slice(0, index).reduce( (offset, image) => offset + image.width, 0);
 };
 
 const getImagesWidth = () => {
-    return images.reduce( (totalWidth, image) => totalWidth + image.width, 0);
+    return images.reduce((totalWidth, image) => totalWidth + image.width, 0);
 };
 
 function pushToCanvas(img, index) {
@@ -54,7 +48,7 @@ function pushToCanvas(img, index) {
         const imgAspectRatio = getAspectRatio(imgWidth, imgHeight);
 
         let tempAfter;
-        const imgOffset = getOffset(index);
+        const imgOffset = getLeftOffset(index);
 
         img.height = canvasHeight;
         img.width = canvasHeight * imgAspectRatio;
@@ -75,7 +69,7 @@ function pushToCanvas(img, index) {
             ctx.putImageData(temp,0,0);
 
             if(imgOffset === 0) {
-                let imgOffsetAfter = getOffset(index + 1);
+                let imgOffsetAfter = getLeftOffset(index + 1);
                 canvas.width = getImagesWidth();
                 ctx.putImageData(tempAfter, imgOffsetAfter, 0);
                 ctxTest.putImageData(tempAfter,0,0);
