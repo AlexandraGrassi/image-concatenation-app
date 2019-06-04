@@ -44,9 +44,7 @@ const getOffset = (index) => {
 };
 
 const getImagesWidth = () => {
-    return images.reduce( (accumulator, currentValue) => {
-        return accumulator + currentValue.width;
-    },0);
+    return images.reduce( (totalWidth, image) => totalWidth + image.width, 0);
 };
 
 function pushToCanvas(img, index) {
