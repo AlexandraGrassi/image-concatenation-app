@@ -1,7 +1,9 @@
 const canvas = document.getElementById("photosContainer");
 const canvasTest = document.getElementById("test");
+
 const ctx = canvas.getContext("2d");
 const ctxTest = canvasTest.getContext("2d");
+
 const inputs = Array.from(document.getElementsByTagName("input"));
 const images = [];
 let temp;
@@ -16,11 +18,20 @@ inputs.forEach((input, index) => {
             let files = e.target.files;
             let curImg = new Image();
             images[index] = curImg;
-            loadImage(files, curImg, index);
+            if (FileReader && files && files.length) {
+                const fr = new FileReader();
+                fr.readAsDataURL(files[0]);
+
+                fr.onload = () => {
+                    curImg.src = fr.result.toString();
+                    pushToCanvas(curImg, index);
+                    console.log(images);
+                };
+
+            }
         };
     }
 });
-
 
 const getAspectRatio = (width, height) => width / height;
 
@@ -44,7 +55,9 @@ function pushToCanvas(img, index) {
     img.onload = () => {
         const {width: imgWidth, height: imgHeight} = img;
         const {width: canvasWidth, height: canvasHeight} = canvas;
+
         const imgAspectRatio = getAspectRatio(imgWidth, imgHeight);
+
         let tempAfter;
         let imgOffset;
 
@@ -52,7 +65,6 @@ function pushToCanvas(img, index) {
         img.width = canvasHeight * imgAspectRatio;
 
         imgOffset = getOffset(index);
-
 
         if(canvasWidth === 0) {
             canvas.width = img.width;
@@ -84,18 +96,3 @@ function pushToCanvas(img, index) {
         temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
     };
 }
-
-function loadImage(files, img, index) {
-    if (FileReader && files && files.length) {
-        const fr = new FileReader();
-        fr.readAsDataURL(files[0]);
-
-        fr.onload = () => {
-            img.src = fr.result;
-            pushToCanvas(img, index);
-            console.log(images);
-        };
-
-    }
-}
-
